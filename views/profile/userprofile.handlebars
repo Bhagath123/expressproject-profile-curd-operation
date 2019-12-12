@@ -1,0 +1,29 @@
+ {{#each profile}}
+<div class="container">
+    <div class="row">
+ 
+ <div class="col-md-3 photo">
+            <img src="{{trimString photo.0.path}}" alt="profilepic" class="img-responsive img-fluid">
+        </div>
+        <div class="col-md-9">
+            <h1 class="h1 bg-dark text-light mt-2 p-1">profile </h1>
+          
+            <ul class="list-group">
+                <li class="list-group-item mt-2">  <span>name:</span> {{name}}</li>
+                <li class="list-group-item mt-2"><span>phonenumber:</span>{{phonenumber}}</li>
+                <li class="list-group-item mt-2"> <span>company:</span>{{company}}</li>
+                <li class="list-group-item mt-2"> <span>location:</span>{{location}}</li>
+                <li class="list-group-item mt-2"><span>education:</span>{{education}}</li>
+              
+                <span class="text-danger float-left display-block ">{{ formatDate Date day="numeric" month="long" year="numeric"}}</span>
+                <span class="text-primary float-left display-block">{{ formatRelative Date }}</span>
+              </ul>
+     <div class="form-group mt-2 clearfix">
+         <a href="/profile/editprofile/{{id}}" class="btn btn-outline-primary">edit profile</a>
+         </div>
+        </div>
+    </div>
+</div>
+{{else}}
+<h1>No data</h1>
+{{/each}}

@@ -1,0 +1,32 @@
+<div class="container">
+   <h1 class="h1 display-6 text-left mt-4 text-light bg-dark p-1">Add profile form</h1>
+<form action="/profile/editprofile/{{id}}/?_method=PUT" method="POST" enctype="multipart/form-data">
+  <div class="form-row">
+       <div class="col-4 mt-2">
+       <input type="file" class="form-control"  name="photo" placeholder="upload a photo" value="{{profile.photo}}">
+    </div>
+    <div class="col-4 mt-2">
+       <input type="text" class="form-control"  name="name" placeholder=" enter aname" value="{{profile.name}}" >
+    </div>
+    <div class="col-4 mt-2">
+      <input type="text" class="form-control" placeholder="phone number" name="phonenumber" value="{{profile.phonenumber}}">
+    </div>
+    <div class="col-4 mt-2">
+      <input type="text" class="form-control" placeholder="company" name="company" value="{{profile.company}}">
+    </div>
+    <div class="col-4 mt-2">
+      <input type="text" class="form-control" placeholder="location" name="location" value="{{profile.location}}">
+    </div>
+    <div class="col-4 mt-2">
+      <input type="text" class="form-control" placeholder="education" name="education" value="{{profile.education}}">
+    </div>
+      <div class="col-12 mt-4">
+      <button type="submit" class="btn btn-success"> submit</button>
+    </div>
+  </div>
+</form>
+{{#each errors}}
+<div class="alert alert-danger mt-2">{{text}}</div>
+{{else}}
+{{/each}}
+</div>
