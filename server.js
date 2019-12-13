@@ -4,8 +4,10 @@ const exphbs=require('express-handlebars');
 const multer=require('multer');
 const bodyparser=require('body-parser');
 const Handlebars=require('handlebars');
-var HandlebarsIntl = require('handlebars-intl');
+var HandlebarsIntl = require('handlebars-intl');//for formatjs date and time 
 var methodOverride = require('method-override');
+var session=require('express-session');
+var flash=require('connect-flash');
 const app=express();
 HandlebarsIntl.registerWith(Handlebars);
 //method override here
@@ -18,16 +20,32 @@ mongoose.connect(mongourl,{useUnifiedTopology:true,useNewUrlParser:true},(err)=>
     if(err) throw err
     else
     console.log("db is connected");
+});
+//session middleware here
+app.use(
+    session({
+        secret:"bhagath",
+        resave:false,
+        saveUninitialized:true
+    })
+);
+//connect flash middleware
+app.use(flash());
+//create global middleware
+app.use(function(req,res,next){
+    res.locals.success_msg=req.flash('success_msg');
+    res.locals.error_msg=req.flash('error_msg');
+    res.locals.error=req.flash('error');10
+    next();
 })
+
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 app.use(express.static(__dirname+"/public"));//it is used to server the static file public folder we need to use this middleware
-
 Handlebars.registerHelper('trimString', function(passedString) {
     var theString =[... passedString].splice(6).join('');
     return new Handlebars.SafeString(theString)
 });
-
 const storage=multer.diskStorage({
     destination:function(req,file,cb){
         cb(null,'public/uploads');
@@ -69,10 +87,8 @@ app.get('/profile/editprofile/:id',(req,res)=>{
         })
     }).catch(err=>{
         console.log(err);
-        
-    })
+          })
 })
-
 //create profile by using http post
 app.post('/profile/addprofile',uploads.single('photo'),(req,res)=>{
   const  errors=[];
@@ -108,30 +124,37 @@ app.post('/profile/addprofile',uploads.single('photo'),(req,res)=>{
         //to save to data base
         new databaseconnection(newProfile).save().then(profile=>{
             console.log(profile);
-            
-            res.render('home.handlebars');
+            req.flash('success_msg','successfully profile stored');
+            res.redirect('/profile/userprofile');
         }).catch(err=>{console.log(err);
         })
     }
-});
+ });
 //editprofile putmethod route here
-app.put('/profile/editprofile/:id',(req,res)=>{
+app.put('/profile/editprofile/:id',uploads.single('photo'),(req,res)=>{
     databaseconnection.findOne({_id:req.params.id}).then(profile=>{
-        name=req.body.phone;
-        phonenumber=req.body.phonenumber;
-        company=req.body.company;
-        location=req.body.location;
-        education=req.body.education;
+       profile.photo=req.file;
+       profile.name=req.body.name;
+       profile.phonenumber=req.body.phonenumber;
+       profile.company=req.body.company;
+       profile.location=req.body.location;
+       profile.education=req.body.education;
+       //save to database
         profile.save().then(profile=>{
-
+            req.flash('success_msg','successfully profile updated');
+         res.redirect('/profile/userprofile');
         }).catch(err=>{
             if(err) throw err
         })
-    }).catch(err=>{
-        console.log(err);
-        
-    })
-})
+    });
+    //delete profile route
+    app.delete('/profile/deleteprofile/:id',(req,res)=>{
+        databaseconnection.remove({_id:req.params.id}).then(profile=>{
+            req.flash('error_msg','successfully profile deleted');
+            res.redirect('/profile/userprofile');
+        });
+    });
+});
 app.get('**',(req,res)=>{
     res.render("404.handlebars");
 })
